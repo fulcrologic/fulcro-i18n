@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.fulcrologic</groupId>
+    <artifactId>fulcro-i18n</artifactId>
+    <packaging>jar</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <name>fulcro</name>
+    <description>A library for adding i18n strings and formatting to Fulcro apps</description>
+    <url>https://github.com/fulcrologic/fulcro-i18n</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/fulcrologic/fulcro-i18n</url>
+        <connection>scm:git:git://github.com/fulcrologic/fulcro-i18n.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/fulcrologic/fulcro-i18n.git</developerConnection>
+        <tag>f59db3cdd859a679a515ed83bdc81d89b4a9291e</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>clojars</id>
+            <name>Clojars repository</name>
+            <url>https://clojars.org/repo</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <sourceDirectory>src/main</sourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>src/main</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>clojars</id>
+            <url>https://repo.clojars.org/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.taoensso</groupId>
+            <artifactId>timbre</artifactId>
+            <version>4.10.0</version>
+        </dependency>
+    </dependencies>
+
+</project>
