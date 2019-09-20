@@ -1,0 +1,11 @@
+= Fulcro I18N
+
+This is a work in progress to port Fulcro 2's i18n support
+to a library for Fulcro 3.  The code has been ported, but the
+documentation (in I18N.adoc) has not been updated.
+
+Use at your own risk. PRs accepted, but Fulcrologic is not
+making this library a priority for the moment (the code has
+been used by commercial clients, and all tests pass, so it
+is likely to be fine.  We don't have time to update docs
+and test it).

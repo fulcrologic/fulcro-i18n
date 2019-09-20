@@ -1,0 +1,19 @@
+{
+  "name": "fulcro-i18n",
+  "version": "1.0.0",
+  "description": "Testing",
+  "main": "index.js",
+  "directories": {},
+  "devDependencies": {
+    "intl-messageformat": "^2.2.0",
+    "karma": "3.1.4",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-cljs-test": "0.1.0",
+    "karma-firefox-launcher": "1.1.0",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "shadow-cljs": "2.8.54"
+  },
+  "author": "Tony Kay",
+  "license": "MIT"
+}
