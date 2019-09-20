@@ -1,5 +1,8 @@
 = Fulcro I18N
 
+image:https://img.shields.io/clojars/v/com.fulcrologic/fulcro-i18n.svg[link=https://clojars.org/com.fulcrologic/fulcro-i18n]
+image:https://circleci.com/gh/fulcrologic/fulcro-i18n/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/fulcrologic/fulcro-i18n/tree/master"]
+
 This is a work in progress to port Fulcro 2's i18n support
 to a library for Fulcro 3.  The code has been ported, but the
 documentation (in I18N.adoc) has not been updated.
