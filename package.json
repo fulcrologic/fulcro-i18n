@@ -15,5 +15,11 @@
     "shadow-cljs": "2.8.54"
   },
   "author": "Tony Kay",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "highlight.js": "9.15.10",
+    "react-grid-layout": "0.16.6",
+    "react-icons": "2.2.7",
+    "reakit": "0.11.2"
+  }
 }

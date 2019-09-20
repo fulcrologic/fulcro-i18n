@@ -14,7 +14,7 @@
   6. Have translators generate PO files for each locale you desire, and place those where your server can serve them.
 
   See the Developer's Guide for more details."
-  #?(:cljs (:require-macros fulcro.i18n))
+  #?(:cljs (:require-macros com.fulcrologic.fulcro-i18n.i18n))
   (:require
     [com.fulcrologic.fulcro.application :as app]
     [com.fulcrologic.fulcro.mutations :refer [defmutation]]
