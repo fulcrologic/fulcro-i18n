@@ -1,4 +1,3 @@
-= Fulcro Developers Guide
 :author: Tony Kay
 :revdate: September 19, 2018
 :revnumber: 1
