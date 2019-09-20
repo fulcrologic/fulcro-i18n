@@ -29,7 +29,7 @@ endif::[]
 
 = Internationalization [[I18N]]
 
-WARNING: This documentation has not yet been updated from Fulcro 2.
+WARNING: I took a rough pass at updating this documentation, but nothing has been testing in a live app.
 
 Fulcro has had internationalization support since inception. That original support worked well from the call-site; however,
 many lessons were learned about storing, transmitting, and structuring the actual data.
@@ -141,8 +141,8 @@ FormatJS library as a script in your HTML, and then use something like this:
 
 ```
 (ns appns
-  (:require [fulcro.client.primitives :as prim :refer [defsc]]
-            [fulcro.i18n :as i18n :refer [tr trc trf]]))
+  (:require [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
+            [com.fulcrologic.fulcro-i18n.i18n :as i18n :refer [tr trc trf]]))
 
 (defn message-formatter [{:keys [::i18n/localized-format-string ::i18n/locale ::i18n/format-options]}]
   (let [locale-str (name locale)
@@ -162,14 +162,14 @@ When creating your client:
 +
 ```
 (ns appns
-  (:require [fulcro.client :as fc]
-            [fulcro.i18n :as i18n]))
+  (:require [com.fulcrologic.fulcro.application :as app]
+            [com.fulcrologic.fulcro-i18n.i18n :as i18n]))
 
 (defn message-formatter ...)
 
-(defonce app (atom (fc/make-fulcro-client
-                     {:reconciler-options {:shared    {::i18n/message-formatter message-formatter}
-                                           :shared-fn ::i18n/current-locale}}}})))
+(defonce app (app/fulcro-app
+  {:shared    {::i18n/message-formatter message-formatter}
+   :shared-fn ::i18n/current-locale}))
 ```
 +
 . Your `Root` UI component *MUST* query for `::i18n/current-locale` and should also set the initial locale in
