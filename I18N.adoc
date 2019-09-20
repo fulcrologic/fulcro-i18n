@@ -29,6 +29,8 @@ endif::[]
 
 = Internationalization [[I18N]]
 
+WARNING: This documentation has not yet been updated from Fulcro 2.
+
 Fulcro has had internationalization support since inception. That original support worked well from the call-site; however,
 many lessons were learned about storing, transmitting, and structuring the actual data.
 
