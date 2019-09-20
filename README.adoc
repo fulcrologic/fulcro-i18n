@@ -12,3 +12,23 @@ making this library a priority for the moment (the code has
 been used by commercial clients, and all tests pass, so it
 is likely to be fine.  We don't have time to update docs
 and test it).
+
+== Contributing:
+
+Dev mode tests:
+
+- Clojure: Just use the REPL (recommended), or you can use:
+
+```
+clojure -A:dev:test:clj-tests --watch
+```
+
+- Clojurescript: Use shadow-cljs target:
+
+
+```
+$ npm install
+$ npx shadow-cljs watch test
+```
+
+Then open http://localhost:9002.
