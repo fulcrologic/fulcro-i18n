@@ -65,6 +65,7 @@
   (action [{:keys [state app]}]
     (swap! state dissoc ::translations)
     (when app
+      (app/update-shared! app)
       (app/force-root-render! app))))
 
 (defn is-locale-loaded?
