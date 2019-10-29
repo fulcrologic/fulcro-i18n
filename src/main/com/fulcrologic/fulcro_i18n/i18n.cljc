@@ -76,17 +76,16 @@
 (defn ensure-locale-loaded!
   "Ensure that the given locale is loaded. Is a no-op if there are translations in app state for the given locale
   which is a keyword like :es-MX."
-  [app locale]
-  (let [state (app/current-state app)]
-    (when-not (is-locale-loaded? @state locale)
-      (df/load! app ::translations Locale {:params        {:locale locale}
-                                           :marker        false
-                                           :post-mutation `translations-loaded}))))
+  [app locale state]
+  (when-not (is-locale-loaded? @state locale)
+    (df/load! app ::translations Locale {:params        {:locale locale}
+                                         :marker        false
+                                         :post-mutation `translations-loaded})))
 (defmutation change-locale
   "Mutation: Change the locale. The parameter should be a locale ID, which is a keyword like :en or :es-MX."
   [{:keys [locale]}]
   (action [{:keys [state app]}]
-    (ensure-locale-loaded! app locale)
+    (ensure-locale-loaded! app locale state)
     (swap! state assoc ::current-locale (comp/get-ident Locale {::locale locale}))
     (app/force-root-render! app))
   (refresh [env]
