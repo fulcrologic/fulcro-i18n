@@ -34,3 +34,7 @@ msgstr "M"
 #: i18n_alpha_cards.js:206
 msgid "Hello"
 msgstr "Hola"
+
+#: i18n_alpha_cards.js:206
+msgid "\"This\" is quoted"
+msgstr "\"Esto\" se cita"

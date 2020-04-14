@@ -160,6 +160,7 @@
                        ::i18n/translations {["" "It is {n,date}"]       "Es {n, date}"
                                             ["" "Hello, {name}"]        "Hola {name}"
                                             ["Gender abbreviation" "M"] "M"
+                                            ["" "\"This\" is quoted"] "\"Esto\" se cita"
                                             ["" "Hello"]                "Hola"}})))))
 
 #?(:clj
