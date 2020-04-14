@@ -35,12 +35,13 @@
   [gettext-block]
   (let [lines (str/split-lines gettext-block)]
     (-> (reduce (fn [{:keys [msgid msgctxt msgstr section] :as acc} line]
-                  (let [[_ k v :as keyline] (re-matches #"^(msgid|msgctxt|msgstr)\s+\"(.*)\"\s*$" line)]
+                  (let [[_ k v :as keyline] (re-matches #"^(msgid|msgctxt|msgstr)\s+\"(.*)\"\s*$" line)
+                        unescaped-value (when v (str/replace v #"\\" ""))]
                     (cond
                       (and line (.matches line "^\".*\"$")) (update acc section #(str % (stripquotes line)))
                       (and k (#{"msgid" "msgctxt" "msgstr"} k)) (-> acc
                                                                   (assoc :section (keyword k))
-                                                                  (update (keyword k) #(str % v)))
+                                                                  (update (keyword k) #(str % unescaped-value)))
                       :else (do
                               (println "Unexpected input -->" line "<--")
                               acc)))) {} lines)
