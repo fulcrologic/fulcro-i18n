@@ -18,7 +18,8 @@
   {::i18n/locale       :es
    ::i18n/translations {["" "Hi"]                                      "Ola"
                         ["Abbreviation for Monday" "M"]                "L"
-                        ["" "{n,plural,=0 {none} =1 {one} other {#}}"] "{n,plural,=0 {nada} =1 {uno} other {#}}"}})
+                        ["" "{n,plural,=0 {none} =1 {one} other {#}}"] "{n,plural,=0 {nada} =1 {uno} other {#}}"
+                        ["" "\"This\" is quoted"] "\"Esto\" se cita"}})
 
 (def locale-with-no-translations
   {::i18n/locale       :en-US
@@ -141,6 +142,11 @@
         (trf "Hi, {name}" :name "Tony") => "Hi, Tony"
         "trf map-based"
         (trf "Hi, {name}" {:name "Tony"}) => "Hi, Tony"))))
+
+(specification "Escaping in translation keys"
+  (i18n/with-locale deflt-format es-locale
+    (assertions
+      (tr "\"This\" is quoted") => "\"Esto\" se cita")))
 
 #?(:clj
    (specification "Locale loading from PO files."

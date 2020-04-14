@@ -101,11 +101,13 @@
   Options is sent to the configured formatter, and may also include ::i18n/context to represent translation context.
   "
   ([string]
-   (let [k           ["" string]
+   (let [escaped-string (str/escape string {\\ "\\\\"})
+         k           ["" escaped-string]
          translation (get-in comp/*shared* [::translations k] string)]
      (if (= "" translation) string translation)))
   ([string {:keys [::context] :as options}]
-   (let [k           [(or context "") string]
+   (let [escaped-string (str/escape string {\\ "\\\\"})
+         k           [(or context "") escaped-string]
          locale      (get-in comp/*shared* [::locale] :en)  ; some locale needed or formatter might crash
          entry       (get-in comp/*shared* [::translations k] string)
          translation (if (= "" entry) string entry)
