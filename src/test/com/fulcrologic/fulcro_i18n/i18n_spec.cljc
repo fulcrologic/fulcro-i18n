@@ -12,7 +12,7 @@
     [taoensso.timbre :as log])
   #?(:clj
      (:import (com.ibm.icu.text MessageFormat)
-              (java.util Locale))))
+              (java.util Date Locale))))
 
 (def es-locale
   {::i18n/locale       :es
@@ -29,7 +29,7 @@
    ::i18n/translations {["" "Hi"] ""}})
 
 (defn date [year month day hour min sec millis]
-  #?(:clj  (java.util.Date. (- year 1900) month day hour min sec)
+  #?(:clj  (Date. (- year 1900) month day hour min sec)
      :cljs (js/Date. year month day hour min sec millis)))
 
 (defn deflt-format [{:keys [::i18n/localized-format-string
@@ -121,7 +121,7 @@
            :clj  (assertions
                    "formats dates - Mexico (server-side)"
                    (trf "{a, date, long}" :a (date 1990 3 1 13 45 22 0)) => "1 de abril de 1990"
-                   (trf "{a, date, medium}" :a (date 1990 3 1 13 45 22 0)) =fn=> (fn [s] (re-matches #"1 abr 1990" s))
+                   (trf "{a, date, medium}" :a (date 1990 3 1 13 45 22 0)) => "1 abr. 1990"
                    (trf "{a, date, short}" :a (date 1990 3 1 13 45 22 0)) => "01/04/90")))
       (behavior "formats plurals - Spanish"
         (assertions
@@ -146,8 +146,8 @@
    (specification "Locale loading from PO files."
      (when-mocking
        (log/-log! _ lvl _ _ _ _ _ _ _ _) => (assertions
-                                          "Logs an error when no locale is found"
-                                          lvl => :error)
+                                              "Logs an error when no locale is found"
+                                              lvl => :error)
 
        (let [xlation         (i18n/load-locale "fulcro" :es)
              missing-xlation (i18n/load-locale "boo" :xx)]
@@ -160,7 +160,7 @@
                        ::i18n/translations {["" "It is {n,date}"]       "Es {n, date}"
                                             ["" "Hello, {name}"]        "Hola {name}"
                                             ["Gender abbreviation" "M"] "M"
-                                            ["" "\"This\" is quoted"] "\"Esto\" se cita"
+                                            ["" "\"This\" is quoted"]   "\"Esto\" se cita"
                                             ["" "Hello"]                "Hola"}})))))
 
 #?(:clj
