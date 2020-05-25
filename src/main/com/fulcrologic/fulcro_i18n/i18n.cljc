@@ -77,7 +77,7 @@
   which is a keyword like :es-MX."
   [app locale]
   (let [state (app/current-state app)]
-    (when-not (is-locale-loaded? @state locale)
+    (when-not (is-locale-loaded? state locale)
       (df/load! app ::translations Locale {:params        {:locale locale}
                                            :marker        false
                                            :post-mutation `translations-loaded}))))
