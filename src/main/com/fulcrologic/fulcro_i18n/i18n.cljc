@@ -77,7 +77,7 @@
   which is a keyword like :es-MX."
   [app locale]
   (let [state (app/current-state app)]
-    (when-not (is-locale-loaded? @state locale)
+    (when-not (is-locale-loaded? state locale)
       (df/load! app ::translations Locale {:params        {:locale locale}
                                            :marker        false
                                            :post-mutation `translations-loaded}))))
@@ -87,7 +87,7 @@
   (action [{:keys [state app]}]
     (ensure-locale-loaded! app locale)
     (swap! state assoc ::current-locale (comp/get-ident Locale {::locale locale}))
-    (app/force-root-render! app))
+    (js/setTimeout #(app/force-root-render! app) 200))
   (refresh [env]
     [::current-locale]))
 
