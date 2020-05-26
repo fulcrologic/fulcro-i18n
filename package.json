@@ -12,7 +12,7 @@
     "karma-firefox-launcher": "1.1.0",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "shadow-cljs": "2.8.54"
+    "shadow-cljs": "2.8.100"
   },
   "author": "Tony Kay",
   "license": "MIT",
