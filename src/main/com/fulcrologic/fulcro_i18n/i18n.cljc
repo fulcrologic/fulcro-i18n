@@ -87,7 +87,7 @@
   (action [{:keys [state app]}]
     (ensure-locale-loaded! app locale)
     (swap! state assoc ::current-locale (comp/get-ident Locale {::locale locale}))
-    (app/schedule-render! app {:force-root? true}))
+    (app/force-root-render! app))
   (refresh [env]
     [::current-locale]))
 
