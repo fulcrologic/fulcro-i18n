@@ -5,21 +5,18 @@
   "main": "index.js",
   "directories": {},
   "devDependencies": {
-    "intl-messageformat": "^2.2.0",
-    "karma": "3.1.4",
-    "karma-chrome-launcher": "2.2.0",
+    "intl-messageformat": "^9.3.11",
+    "karma": "5.2.3",
+    "karma-chrome-launcher": "3.1.0",
     "karma-cljs-test": "0.1.0",
-    "karma-firefox-launcher": "1.1.0",
-    "react": "16.8.6",
-    "react-dom": "16.8.6",
-    "shadow-cljs": "2.8.100"
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "shadow-cljs": "2.11.5"
   },
   "author": "Tony Kay",
   "license": "MIT",
   "dependencies": {
-    "highlight.js": "9.15.10",
-    "react-grid-layout": "0.16.6",
-    "react-icons": "2.2.7",
-    "reakit": "0.11.2"
+    "highlight.js": "^9.12.0",
+    "react-grid-layout": "^0.16.6"
   }
 }

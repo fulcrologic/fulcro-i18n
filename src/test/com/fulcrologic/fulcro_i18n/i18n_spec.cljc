@@ -3,8 +3,8 @@
     [clojure.string :as str]
     [fulcro-spec.core :refer [specification behavior provided assertions when-mocking]]
     [com.fulcrologic.fulcro-i18n.i18n :as i18n :refer [tr trf trc]]
-    #?(:cljs
-       ["intl-messageformat" :default IntlMessageFormat])
+    [com.fulcrologic.fulcro-i18n.i18n-sample-locale-selector :refer [LocaleSelector ui-locale-selector]]
+    #?(:cljs ["intl-messageformat" :default IntlMessageFormat])
     [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
     [com.fulcrologic.fulcro.algorithms.server-render :as ssr]
     #?(:cljs [com.fulcrologic.fulcro.dom :as dom]
@@ -13,6 +13,8 @@
   #?(:clj
      (:import (com.ibm.icu.text MessageFormat)
               (java.util Date Locale))))
+
+(declare => =fn=>)
 
 (def es-locale
   {::i18n/locale       :es
@@ -169,7 +171,7 @@
       :initial-state {:ui/checked? false}}
      (dom/div nil
        (dom/p nil (trf "Hello, {name}" {:name "Sam"}))
-       (dom/p nil (trf "It is {n,date}" {:n (java.util.Date.)}))
+       (dom/p nil (trf "It is {n,date}" {:n (Date.)}))
        (dom/p nil (trc "Gender abbreviation" "M"))
        (tr "Hello"))))
 
@@ -178,7 +180,7 @@
 
 #?(:clj
    (defsc Root [this {:keys [child locale-selector]}]
-     {:query         [{:locale-selector (comp/get-query i18n/LocaleSelector)}
+     {:query         [{:locale-selector (comp/get-query LocaleSelector)}
                       {::i18n/current-locale (comp/get-query i18n/Locale)}
                       {:child (comp/get-query Child)}]
       :initial-state {:child                {}
@@ -187,7 +189,7 @@
                                                        {:locale :es :name "Espanol"}
                                                        {:locale :de :name "Deutsch"}]}}}
      (dom/div nil
-       (i18n/ui-locale-selector locale-selector)
+       (ui-locale-selector locale-selector)
        (ui-child child))))
 
 #?(:clj

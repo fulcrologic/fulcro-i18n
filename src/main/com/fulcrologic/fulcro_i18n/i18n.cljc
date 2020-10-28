@@ -20,9 +20,6 @@
     [com.fulcrologic.fulcro.mutations :refer [defmutation]]
     [com.fulcrologic.fulcro.data-fetch :as df]
     [taoensso.timbre :as log]
-    [clojure.spec.alpha :as s]
-    #?(:cljs [com.fulcrologic.fulcro.dom :as dom]
-       :clj  [com.fulcrologic.fulcro.dom-server :as dom])
     [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
     [clojure.string :as str]
     #?@(:clj ([com.fulcrologic.fulcro-i18n.gettext :as gt]
@@ -117,27 +114,6 @@
          (catch #?(:cljs :default :clj Throwable) e
            (log/error "Unable to format output " e)
            "???"))))))
-
-(defsc LocaleSelector
-  "A reusable locale selector. Generates a simple `dom/select` with CSS class fulcro$i18n$locale_selector.
-
-  Remember that for localization to work you *must* query for `::i18n/current-locale` in your root
-  component with the query [{::i18n/current-locale (prim/get-query Locale)}]."
-  [this {:keys [::available-locales ::current-locale]}]
-  {:query         [{::available-locales (comp/get-query Locale)}
-                   {[::current-locale '_] (comp/get-query Locale)}]
-   :initial-state {::available-locales :param/locales}}
-  (let [{:keys [::locale]} current-locale
-        locale-kw (fn [l] (-> l (str/replace #":" "") keyword))]
-    (dom/select :.fulcro$i18n$locale_selector
-      {:onChange (fn [evt] #?(:cljs (comp/transact! this `[(change-locale {:locale ~(locale-kw (.. evt -target -value))})])))
-       :value    locale}
-      (map-indexed
-        (fn [i {:keys [::locale :ui/locale-name]}]
-          (dom/option {:key i :value locale} locale-name))
-        available-locales))))
-
-(def ui-locale-selector (comp/factory LocaleSelector))
 
 #?(:clj
    (defn tr-ssr [msg] (t msg))
