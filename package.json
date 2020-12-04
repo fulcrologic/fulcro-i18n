@@ -16,7 +16,7 @@
   "author": "Tony Kay",
   "license": "MIT",
   "dependencies": {
-    "highlight.js": "^9.12.0",
+    "highlight.js": "^10.4.1",
     "react-grid-layout": "^0.16.6"
   }
 }
