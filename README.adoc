@@ -1,11 +1,11 @@
 = Fulcro I18N
 
 image:https://img.shields.io/clojars/v/com.fulcrologic/fulcro-i18n.svg[link=https://clojars.org/com.fulcrologic/fulcro-i18n]
-image:https://circleci.com/gh/fulcrologic/fulcro-i18n/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/fulcrologic/fulcro-i18n/tree/master"]
+image:https://circleci.com/gh/fulcrologic/fulcro-i18n/tree/main.svg?style=svg["CircleCI", link="https://circleci.com/gh/fulcrologic/fulcro-i18n/tree/main"]
 
 An internationalization library, targeted at Fulcro 3 applications.
 
-See https://github.com/fulcrologic/fulcro-i18n/blob/master/I18N.adoc[documentation] for usage.
+See https://github.com/fulcrologic/fulcro-i18n/blob/main/I18N.adoc[documentation] for usage.
 
 NOTE: Breaking change from 0.0.4-alpha -> 0.0.5-alpha. LocaleSelector was moved to
 a new ns so that i18n could be used from React Native. You will need to update your requires.
