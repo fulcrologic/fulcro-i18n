@@ -77,9 +77,11 @@
     (when-not (is-locale-loaded? state locale)
       (df/load! app ::translations Locale {:params        {:locale locale}
                                            :marker        false
+                                           :parallel      true
                                            :post-mutation `translations-loaded}))))
 (defmutation change-locale
-  "Mutation: Change the locale. The parameter should be a locale ID, which is a keyword like :en or :es-MX."
+  "[{:keys [locale]}]
+   Mutation: Change the locale. The parameter should be a locale ID, which is a keyword like :en or :es-MX."
   [{:keys [locale]}]
   (action [{:keys [state app]}]
     (ensure-locale-loaded! app locale)

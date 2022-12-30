@@ -1,18 +1,14 @@
 (ns com.fulcrologic.fulcro-i18n.i18n-spec
   (:require
     [clojure.string :as str]
-    [fulcro-spec.core :refer [specification behavior provided assertions when-mocking]]
+    [fulcro-spec.core :refer [specification behavior assertions when-mocking]]
     [com.fulcrologic.fulcro-i18n.i18n :as i18n :refer [tr trf trc]]
     [com.fulcrologic.fulcro-i18n.i18n-sample-locale-selector :refer [LocaleSelector ui-locale-selector]]
-    #?(:cljs ["intl-messageformat" :default IntlMessageFormat])
+    [com.fulcrologic.fulcro-i18n.icu-formatter :as icu]
     [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
-    [com.fulcrologic.fulcro.algorithms.server-render :as ssr]
     #?(:cljs [com.fulcrologic.fulcro.dom :as dom]
        :clj  [com.fulcrologic.fulcro.dom-server :as dom])
-    [taoensso.timbre :as log])
-  #?(:clj
-     (:import (com.ibm.icu.text MessageFormat)
-              (java.util Date Locale))))
+    [taoensso.timbre :as log]))
 
 (declare => =fn=>)
 
@@ -34,21 +30,7 @@
   #?(:clj  (Date. (- year 1900) month day hour min sec)
      :cljs (js/Date. year month day hour min sec millis)))
 
-(defn deflt-format [{:keys [::i18n/localized-format-string
-                            ::i18n/locale ::i18n/format-options]}]
-  #?(:cljs
-     (let [locale-str (name locale)
-           formatter  (IntlMessageFormat. localized-format-string locale-str)]
-       (.format formatter (clj->js format-options)))
-
-     :clj
-     (let [locale-str (name locale)]
-       (try
-         (let [formatter (new MessageFormat localized-format-string (Locale/forLanguageTag locale-str))]
-           (.format formatter format-options))
-         (catch Exception e
-           (log/error "Formatting failed!" e)
-           "???")))))
+(def deflt-format icu/format)
 
 (specification "Base translation -- tr"
   (assertions

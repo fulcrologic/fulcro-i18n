@@ -58,13 +58,14 @@ but you still need some kind of marker to let you know where translation might b
 
 Examples:
 
-```
+[source]
+-----
 (tr "Hello") ; might return "Hola"
 (trc "Abbreviation for Male" "M") ; might return M (translator sees the other string as a note)
 (trf "Hi {name}" {:name n}) ; passes a translated version of "Hi {name}" to the message formatter along with the options map.
 
 (tr-unsafe current-selection) ; allows a non-literal to be sent through lookup. The possible values of current-selection will need to be extracted elsewhere.
-```
+-----
 
 === Dealing with "Unsafe" Usage
 
@@ -77,7 +78,8 @@ is to simply call `tr` on the literal values in some unreachable code. Whitespac
 these, so extraction will find them, whereas advanced optimizations will see that they are not directly called and
 will remove them:
 
-```
+[source]
+-----
 (defn do-not-call []
   (tr "Yes") ; these are here for extraction only
   (tr "No"))
@@ -86,13 +88,14 @@ will remove them:
 
 (defn render-option [o]
    (tr-unsafe (get options o)))
-```
+-----
 
 WARNING: It is tempting to wrap the values of `options` in `tr`, but that is a bad idea.
 
-```
+[source]
+-----
 (def options {:yes (tr "Yes") :no (tr "No")}) ; BAD IDEA!
-```
+-----
 
 This is a problem because your program can break for unexpected reasons. If you changed the locale before
 that code executed then your `options` map might contain the *translations* instead of the default locale keys
@@ -116,16 +119,18 @@ file, and pushes that alternate string through the rest of the i18n processing c
 
 The macro:
 
-```
+[source]
+-----
 (tr "Hello")
-```
+-----
 
 will use the combination of the current locale and loaded locale data to return the correct translation for "Hello". A
 call to:
 
-```
+[source]
+-----
 (trf "Hi {name}" {:name "Joe"})
-```
+-----
 
 will look up "Hi {name}" in the translations, find something like "Hola, {name}", and will then pass that translation
 through to a message formatter that can substitute the supplied parameters for the placeholders.
@@ -135,41 +140,35 @@ message formatter into Fulcro's i18n system.
 
 == Configuring I18N
 
-Your first step is to define a function that can format messages. If you want to use Yahoo's FormatJS, then you'd add the
-FormatJS library as a script in your HTML, and then use something like this:
+Your first step is to define a function that can format messages. The easiest way to do this is to use the
+`com.fulcrologic.fulcro-i18n.icu-formatter/format` support. This requires the following:
 
-```
-(ns appns
-  (:require [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
-            [com.fulcrologic.fulcro-i18n.i18n :as i18n :refer [tr trc trf]]))
+* Add `com.ibm.icu/icu4j       {:mvn/version "66.1"}` to your deps.edn (or equiv).
+* Add `"intl-messageformat": "^9.3.11"` to your package.json
 
-(defn message-formatter [{:keys [::i18n/localized-format-string ::i18n/locale ::i18n/format-options]}]
-  (let [locale-str (name locale)
-        formatter  (js/IntlMessageFormat. localized-format-string locale-str)]
-    (.format formatter (clj->js format-options))))
-```
-
-The message formatter receives a single map with namespaced keys. The `locale` will be a keyword, the `localized-format-string`
-will be the already-translated base string, and the `format-options` will be whatever map was passed along to `trf`.
+and then use it as your formatter.
+The message formatter receives a single map with `i18n` namespaced keys. `locale` will be a keyword, `localized-format-string`
+will be the *already-translated* base string, and the `format-options` will be whatever map was passed along to `trf`.
 
 Fulcro's i18n uses `shared` properties to communicate the current locale, message formatter, and translations to the
-UI components. This is a feature of the low-level reconciler.
+UI components.
 
 When creating your client:
 
 . Include these options on the client:
 +
-```
+[source]
+-----
 (ns appns
-  (:require [com.fulcrologic.fulcro.application :as app]
-            [com.fulcrologic.fulcro-i18n.i18n :as i18n]))
-
-(defn message-formatter ...)
+  (:require
+    [com.fulcrologic.fulcro.application :as app]
+    [com.fulcrologic.fulcro-i18n.icu-formatter :as icu]
+    [com.fulcrologic.fulcro-i18n.i18n :as i18n]))
 
 (defonce app (app/fulcro-app
-  {:shared    {::i18n/message-formatter message-formatter}
+  {:shared    {::i18n/message-formatter icu/format}
    :shared-fn ::i18n/current-locale}))
-```
+-----
 +
 . Your `Root` UI component *MUST* query for `::i18n/current-locale` and should also set the initial locale in
 application state. The `shared-fn` extracts denormalized data from your UI root's props. This also sets the "default" locale of your application.
@@ -179,15 +178,16 @@ application state. The `shared-fn` extracts denormalized data from your UI root'
 Your root component should place a locale in the `::i18n/current-locale`. This is normalized state, so the root
 component query should join on the `Locale` component:
 
-```
+[source]
+-----
 (defsc Root [this props]
-  {:query         [{::i18n/current-locale (prim/get-query i18n/Locale)}]
-   :initial-state (fn [p] {::i18n/current-locale (prim/get-initial-state i18n/Locale {:locale :en :translations {}})})}
-```
+  {:query         [{::i18n/current-locale (comp/get-query i18n/Locale)}]
+   :initial-state (fn [p] {::i18n/current-locale (comp/get-initial-state i18n/Locale {:locale :en :translations {}})})}
+-----
 
 == Accessing the Current Locale
 
-Shared properties are visible to all UI components via `(prim/shared this)`. You will find the property `::i18n/current-locale`
+Shared properties are visible to all UI components via `(comp/shared this)`. You will find the property `::i18n/current-locale`
 in there as well as your message formatter.
 
 Mutations have the state database, and can simply look for the top-level key `::i18n/current-locale`.
@@ -203,9 +203,10 @@ The are a few aspects to changing the locale:
 All of these tasks are handled for you by the `i18n/change-locale` mutation, which you can embed anywhere in your
 application:
 
-```
-(prim/transact! this `[(i18n/change-locale {:locale :es})])
-```
+[source]
+-----
+(comp/transact! this `[(i18n/change-locale {:locale :es})])
+-----
 
 There is a pre-built <<LocaleSelector, locale selector>> for your convenience.
 
@@ -218,13 +219,14 @@ to the query! Fortunately, configuring your server to serve these is very easy!
 where `LOCALE` matches the locale keyword (minus the `:`), case sensitive.
 . Add a root query like this:
 
-```
-(defquery-root ::i18n/translations
-  (value [env {:keys [locale]}]
-    (if-let [locale (i18n/load-locale "po-files" locale)]
-      locale
-      nil)))
-```
+[source]
+-----
+(defresolver locale-resolver [env {:keys [locale]}]
+  {::pc/output [::i18n/translations]}
+  (if-let [locale (i18n/load-locale "po-files" locale)]
+    locale
+    nil))
+-----
 
 of course you can augment this to log errors or whatever else you want it to do. The `"po-files"` argument is the location
 of the po files. If it is a relative path, the resources will be searched (CLASSPATH). If it is an absolute path, then
@@ -239,9 +241,10 @@ The steps are:
 . Compile your application with whitespace optimizations.
 . Run this on the resulting js file:
 +
-```bash
+[source]
+-----
 $ xgettext --from-code=UTF-8 --debug -k -ktr:1 -ktrc:1c,2 -ktrf:1 -o messages.pot application.js
-```
+-----
 
 == Generating Locale Translation Files
 
@@ -257,9 +260,10 @@ as many of the old translations as possible. This allows your translator to just
 
 Something like this will update a PO file:
 
-```
+[source]
+-----
 $ msgmerge --force-po --no-wrap -U es.po messages.pot
-```
+-----
 
 Again send that off to your translator, and when they return it place the updated PO file on your server.
 
@@ -268,19 +272,20 @@ Again send that off to your translator, and when they return it place the update
 The i18n support comes with a convenient `LocaleSelector` component that you can use. You can, of course, write your
 own and invoke the `change-locale` mutation, but the pre-written one can be used as follows:
 
-```
+[source]
+-----
 (defsc Root [this {:keys [locale-selector]}]
-  {:query         [{:locale-selector (prim/get-query i18n/LocaleSelector)}
-                   {::i18n/current-locale (prim/get-query i18n/Locale)}]
-   :initial-state (fn [p] {::i18n/current-locale (prim/get-initial-state Locale {:locale :en :translations {}})
-                           :locale-selector      (prim/get-initial-state LocaleSelector
-                                                   {:locales [(prim/get-initial-state Locale {:locale :en :name "English"})
-                                                              (prim/get-initial-state Locale {:locale :es :name "Espanol"})
-                                                              (prim/get-initial-state Locale {:locale :de :name "Deutsch"})]}}}
+  {:query         [{:locale-selector (comp/get-query i18n/LocaleSelector)}
+                   {::i18n/current-locale (comp/get-query i18n/Locale)}]
+   :initial-state (fn [p] {::i18n/current-locale (comp/get-initial-state Locale {:locale :en :translations {}})
+                           :locale-selector      (comp/get-initial-state LocaleSelector
+                                                   {:locales [(comp/get-initial-state Locale {:locale :en :name "English"})
+                                                              (comp/get-initial-state Locale {:locale :es :name "Espanol"})
+                                                              (comp/get-initial-state Locale {:locale :de :name "Deutsch"})]}}}
   (dom/div
     (i18n/ui-locale-selector locale-selector)
     ...))
-```
+-----
 
 The initialization parameters are a list of the locales that
 are available on your server. You could, of course, load these at startup and fill out app state; however,
@@ -289,8 +294,6 @@ as easy to hard-code them.
 
 Each locale must be given a name (UTF8) to be show in the resulting select drop-down. This renders
 as an HTML select with the CSS class "fulcro$i18n$locale_selector".
-
-See also `src/cards/fulcro/democards/i18n_cards.cljs` in the main Fulcro source.
 
 == Server-Side Rendering
 
@@ -304,7 +307,8 @@ The steps are:
 . Generate initial db to embed in the HTML that contains the proper normalized `::i18n/current-locale`.
 . Use `i18n/with-locale` to wrap the server render.
 
-```
+[source]
+-----
 (defn message-formatter ...) ; a server-side message formatter, e.g. use IBM's ICU library
 
 (defn generate-index-html [state-db app-html]
@@ -312,35 +316,12 @@ The steps are:
     (str "<html><head>" initial-state-script "</head><body><div id='app'>" app-html "</div></body></html>")))
 
 (defn index-html []
-  (let [initial-tree     (prim/get-initial-state Root {})
+  (let [initial-tree     (comp/get-initial-state Root {})
         es-locale        (i18n/load-locale "po-directory" :es)
         tree-with-locale (assoc initial-tree ::i18n/current-locale es-locale)
         initial-db       (ssr/build-initial-state tree-with-locale Root)
-        ui-root          (prim/factory Root)]
+        ui-root          (comp/factory Root)]
     (generate-index-html initial-db
       (i18n/with-locale message-formatter es-locale
         (dom/render-to-str (ui-root tree-with-locale))))))
-```
-
-If you use Yahoo's FormatJS on the client, then a good choice on the server is
-http://site.icu-project.org/[com.ibm.icu/icu4j] since it uses the same syntax for
-format strings.
-
-The message formatter could be:
-
-```
-(ns your-server-ns
-  (:import (com.ibm.icu.text MessageFormat)
-           (java.util Locale)))
-
-(defn message-formatter [{:keys [::i18n/localized-format-string
-                                 ::i18n/locale ::i18n/format-options]}]
-  (let [locale-str (name locale)]
-    (try
-      (let [formatter (new MessageFormat localized-format-string (Locale/forLanguageTag locale-str))]
-        (.format formatter format-options))
-      (catch Exception e
-        (log/error "Formatting failed!" e)
-        "???"))))
-```
-
+-----
