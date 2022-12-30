@@ -8,7 +8,9 @@
     [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
     #?(:cljs [com.fulcrologic.fulcro.dom :as dom]
        :clj  [com.fulcrologic.fulcro.dom-server :as dom])
-    [taoensso.timbre :as log]))
+    [taoensso.timbre :as log])
+  #?(:clj
+     (:import [java.util Date])))
 
 (declare => =fn=>)
 
