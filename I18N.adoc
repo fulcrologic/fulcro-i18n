@@ -221,11 +221,11 @@ where `LOCALE` matches the locale keyword (minus the `:`), case sensitive.
 
 [source]
 -----
-(defresolver locale-resolver [env {:keys [locale]}]
-  {::pc/output [::i18n/translations]}
-  (if-let [locale (i18n/load-locale "po-files" locale)]
-    locale
-    nil))
+(defresolver locale-resolver [env _]
+  {::pco/output [::i18n/translations]}
+  (let [locale (:locale (pco/params env))]
+    (when-let [translations (i18n/load-locale "po-files" locale)]
+      {::i18n/translations translations})))
 -----
 
 of course you can augment this to log errors or whatever else you want it to do. The `"po-files"` argument is the location
