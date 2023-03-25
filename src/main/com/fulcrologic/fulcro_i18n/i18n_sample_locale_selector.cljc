@@ -16,14 +16,14 @@
   {:query         [{::i18n/available-locales (comp/get-query i18n/Locale)}
                    {[::i18n/current-locale '_] (comp/get-query i18n/Locale)}]
    :initial-state {::i18n/available-locales :param/locales}}
-  (let [{:i18n/keys [locale]} current-locale
+  (let [{::i18n/keys [locale]} current-locale
         locale-kw (fn [l] (-> l (str/replace #":" "") keyword))]
     (dom/select :.fulcro$i18n$locale_selector
       {:onChange (fn [evt] #?(:cljs (comp/transact! this
                                       [(i18n/change-locale {:locale (locale-kw (evt/target-value evt))})])))
        :value    locale}
       (map-indexed
-        (fn [i {:keys [::locale :ui/locale-name]}]
+        (fn [i {::i18n/keys [locale] :ui/keys [locale-name]}]
           (dom/option {:key i :value locale} locale-name))
         available-locales))))
 
