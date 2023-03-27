@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  browser-tools: circleci/browser-tools@1.3.0
+  browser-tools: circleci/browser-tools@1.4.1
 jobs:
   cljs:
     docker:
@@ -12,7 +12,14 @@ jobs:
       - run: npm install
       - run: npx shadow-cljs -v compile ci-tests
       - run: ls -l target
-      - browser-tools/install-browser-tools
+      - browser-tools/install-chrome
+      - browser-tools/install-chromedriver
+      - run:
+          name: Check browser tools versions
+          command: |
+            google-chrome --version
+            chromedriver --version
+            java -jar /usr/local/bin/selenium.jar --version
       - run: npx karma start --single-run
       - save_cache:
           paths:
