@@ -1,6 +1,10 @@
 (ns com.fulcrologic.fulcro-i18n.gettext
   "A set of functions for working with GNU gettext translation files, including translation generation tools to go
-  from PO files to cljc."
+  from PO files to cljc.
+
+  WARNING: This used to use dynamic vars and a global var with dynamic code loading. Those functions are no longer
+  used, but are left to prevent library breakage. The current versions treat translations as pure data that can
+  be loaded on demand from the server as data into app state instead."
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.pprint :as pp]
@@ -188,7 +192,7 @@
                                 verify-po-folders
                                 find-po-files)]
     (println "Extracting strings")
-    (run "xgettext" "--from-code=UTF-8" "--debug" "-k" "-ktr:1" "-ktrc:1c,2" "-ktrf:1" "-o" messages-pot js-path)
+    (run "xgettext" "--from-code=UTF-8" "--debug" "-k" "-kfulcro_tr:1" "-kfulcro_trc:1c,2" "-kfulcro_trf:1" "-o" messages-pot js-path)
     (doseq [po (:existing-po-files settings)]
       (when (.exists (io/as-file (po-path settings po)))
         (println "Merging extracted PO template file to existing translations for " po)

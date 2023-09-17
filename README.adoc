@@ -7,8 +7,8 @@ An internationalization library, targeted at Fulcro 3 applications.
 
 See https://github.com/fulcrologic/fulcro-i18n/blob/main/I18N.adoc[documentation] for usage.
 
-NOTE: Breaking change from 0.0.4-alpha -> 0.0.5-alpha. LocaleSelector was moved to
-a new ns so that i18n could be used from React Native. You will need to update your requires.
+NOTE: String extraction instructions changed from version 1.0.x to 1.1.x. The extraction names are all now prefixed with `fulcro_`.  See
+the documentation.
 
 == Contributing:
 
@@ -16,16 +16,17 @@ Dev mode tests:
 
 - Clojure: Just use the REPL (recommended), or you can use:
 
-```
+[source]
+-----
 clojure -A:dev:test:clj-tests --watch
-```
+-----
 
 - Clojurescript: Use shadow-cljs target:
 
-
-```
+[source]
+-----
 $ npm install
 $ npx shadow-cljs watch test
-```
+-----
 
 Then open http://localhost:9002.

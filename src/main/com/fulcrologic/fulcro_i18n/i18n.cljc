@@ -8,22 +8,22 @@
   1. Use `tr`, `trf`, `trc`, etc. to embed messages in your UI.
   2. Embed a locale selector, such as the one provided.
   3. Configure your server to serve locales.
-  4. Compile the source of your application with whitespace optimizations.
+  4. Compile the source of your application in release mode with at least whitespace optimizations.
   5. Use `xgettext` (GNU CLI utility) to extract the strings from the js output of (4).
-        xgettext --from-code=UTF-8 --debug -k -ktr_alpha:1 -ktrc_alpha:1c,2 -ktrf_alpha:1 -o messages.pot application.js
+        xgettext --from-code=UTF-8 --debug -k -kfulcro_tr:1 -kfulcro_trc:1c,2 -kfulcro_trf:1 -o messages.pot application.js
   6. Have translators generate PO files for each locale you desire, and place those where your server can serve them.
 
-  See the Developer's Guide for more details."
+  See the I18N.adoc file in the root of this repository or the Fulcro Developer's Guide for more details."
   #?(:cljs (:require-macros com.fulcrologic.fulcro-i18n.i18n))
   (:require
-    [com.fulcrologic.fulcro.application :as app]
-    [com.fulcrologic.fulcro.mutations :refer [defmutation]]
-    [com.fulcrologic.fulcro.data-fetch :as df]
-    [taoensso.timbre :as log]
-    [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
+    #?@(:clj ([clojure.java.io :as io]
+              [com.fulcrologic.fulcro-i18n.gettext :as gt]))
     [clojure.string :as str]
-    #?@(:clj ([com.fulcrologic.fulcro-i18n.gettext :as gt]
-              [clojure.java.io :as io]))))
+    [com.fulcrologic.fulcro.application :as app]
+    [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
+    [com.fulcrologic.fulcro.data-fetch :as df]
+    [com.fulcrologic.fulcro.mutations :refer [defmutation]]
+    [taoensso.timbre :as log]))
 
 #?(:clj
    (defn load-locale
@@ -117,31 +117,21 @@
            (log/error "Unable to format output " e)
            "???"))))))
 
-#?(:clj
-   (defn tr-ssr [msg] (t msg))
-   :cljs
-   (set! js/tr (fn tr [msg] (t msg))))
+(defn fulcro_tr "Do not use. Use the `tr` macro instead." [msg] (t msg))
+(defn ^:deprecated tr-ssr "Do not use. Use `tr` instead." [msg] (t msg))
 
-#?(:clj
-   (defn trc-ssr [ctxt msg] (t msg {::context ctxt}))
-   :cljs
-   (set! js/trc (fn [ctxt msg] (t msg {::context ctxt}))))
+(defn fulcro_trc "Do not use. Use the `trc` macro instead." [ctxt msg] (t msg {::context ctxt}))
+(def ^:deprecated trc-ssr "Do not use. Use `trc` instead." fulcro_trc)
 
-#?(:clj
-   (defn trf-ssr
-     [fmt & rawargs]
-     (let [args   (if (and (= 1 (count rawargs)) (map? (first rawargs)))
-                    (first rawargs)
-                    (into {} (mapv vec (partition 2 rawargs))))
-           argmap (into {} (map (fn [[k v]] [(name k) v]) args))]
-       (t fmt argmap)))
-   :cljs
-   (set! js/trf
-     (fn trf [fmt & args]
-       (let [argmap (if (and (= 1 (count args)) (map? (first args)))
-                      (first args)
-                      (into {} (mapv vec (partition 2 args))))]
-         (t fmt argmap)))))
+(defn fulcro_trf
+  "Do not use. Use trf macro instead."
+  [fmt & rawargs]
+  (let [argmap (if (and (= 1 (count rawargs)) (map? (first rawargs)))
+                 (first rawargs)
+                 (into {} (mapv vec (partition 2 rawargs))))
+        argmap (into {} (map (fn [[k v]] [(name k) v])) argmap)]
+    (t fmt argmap)))
+(def ^:deprecated trf-ssr "Do not use. Use trf instead." fulcro_trf)
 
 #?(:clj
    (defmacro tr-unsafe
@@ -149,7 +139,7 @@
      impossible. This means you have to use some other mechanism to make sure the string ends up in translation
      files (such as manually calling tr on the various raw string values elsewhere in your program)."
      [msg]
-     (if (:ns &env) `(js/tr ~msg) `(tr-ssr ~msg))))
+     `(fulcro_tr ~msg)))
 
 #?(:clj
    (defmacro tr
@@ -162,7 +152,7 @@
            msg (if (string? msg)
                  msg
                  (str "ERROR: tr requires a literal string on line " line " in " (str *ns*)))]
-       (if (:ns &env) `(js/tr ~msg) `(tr-ssr ~msg)))))
+       `(fulcro_tr ~msg))))
 
 #?(:clj
    (defmacro trc
@@ -186,20 +176,20 @@
            [context msg] (if (and (string? context) (string? msg))
                            [context msg]
                            ["" (str "ERROR: trc requires literal strings on line " line " in " (str *ns*))])]
-       (if (:ns &env) `(js/trc ~context ~msg) `(trc-ssr ~context ~msg)))))
+       `(fulcro_trc ~context ~msg))))
 
 #?(:clj
    (defmacro trc-unsafe
      "Same as trc, but does not check for literal strings for arguments. THIS MEANS strings extraction from source for
       these values will not be possible, and you will have to manually ensure they are included in translations."
      [context msg]
-     (if (:ns &env) `(js/trc ~context ~msg) `(trc-ssr ~context ~msg))))
+     `(fulcro_trc ~context ~msg)))
 
 #?(:clj
    (defmacro trf
      "Translate a format string, then use it to format a message with the given arguments. The format MUST be a literal
      string for extraction by gettext. The arguments should a map of keyword/value pairs that will match the embedded
-     items to format.
+     items to format. The keywords must be SIMPLE keywords (only the name portion will be used).
 
      (trf \"{name} owes {amount, currency)\" {:name who :amount amt})
      "
@@ -208,7 +198,7 @@
            [format args] (if (string? format)
                            [format args]
                            [(str "ERROR: trf requires a literal string on line " line " in " (str *ns*)) []])]
-       (if (:ns &env) `(js/trf ~format ~@args) `(trf-ssr ~format ~@args)))))
+       `(fulcro_trf ~format ~@args))))
 
 #?(:clj
    (defmacro with-locale
