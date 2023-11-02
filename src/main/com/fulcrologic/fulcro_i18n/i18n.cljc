@@ -123,14 +123,7 @@
 (defn fulcro_trc "Do not use. Use the `trc` macro instead." [ctxt msg] (t msg {::context ctxt}))
 (def ^:deprecated trc-ssr "Do not use. Use `trc` instead." fulcro_trc)
 
-(defn fulcro_trf
-  "Do not use. Use trf macro instead."
-  [fmt & rawargs]
-  (let [argmap (if (and (= 1 (count rawargs)) (map? (first rawargs)))
-                 (first rawargs)
-                 (into {} (mapv vec (partition 2 rawargs))))
-        argmap (into {} (map (fn [[k v]] [(name k) v])) argmap)]
-    (t fmt argmap)))
+(defn fulcro_trf "Do not use. Use trf macro instead." [fmt argmap] (t fmt argmap))
 (def ^:deprecated trf-ssr "Do not use. Use trf instead." fulcro_trf)
 
 #?(:clj
@@ -193,12 +186,16 @@
 
      (trf \"{name} owes {amount, currency)\" {:name who :amount amt})
      "
-     [format & args]
+     [format & rawargs]
      (let [{:keys [line]} (meta &form)
            [format args] (if (string? format)
-                           [format args]
-                           [(str "ERROR: trf requires a literal string on line " line " in " (str *ns*)) []])]
-       `(fulcro_trf ~format ~@args))))
+                           [format rawargs]
+                           [(str "ERROR: trf requires a literal string on line " line " in " (str *ns*)) []])
+           argmap (if (and (= 1 (count rawargs)) (map? (first rawargs)))
+                    (first rawargs)
+                    (into {} (mapv vec (partition 2 rawargs))))
+           argmap (into {} (map (fn [[k v]] [(name k) v])) argmap)]
+       `(fulcro_trf ~format ~argmap))))
 
 #?(:clj
    (defmacro with-locale
