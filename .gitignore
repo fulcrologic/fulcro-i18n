@@ -4,8 +4,10 @@
 *.sw?
 *.swp
 *jar
+.clj-kondo/*
 .DS_Store
 .idea
+.lsp/*
 .nrepl*
 .nrepl-port
 .repl
