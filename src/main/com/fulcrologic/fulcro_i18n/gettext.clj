@@ -183,16 +183,21 @@
   Parameters:
   `:js-path` - The path to your generated javascript (defaults to `i18n/i18n.js` from project root)
   `:po` - The directory where your PO template and PO files should live (defaults to `i18n` from project root). "
-  [{:keys [js-path po] :or {js-path "i18n/i18n.js" po "i18n"}}]
+  [{:keys [js-path po no-location? sort-output?] :or {js-path "i18n/i18n.js" po "i18n"}}]
   (when-let [{:keys [existing-po-files messages-pot]
               :as   settings} (some-> {:js-path js-path :po po}
-                                expand-settings
-                                js-missing?
-                                gettext-missing?
-                                verify-po-folders
-                                find-po-files)]
+                                      expand-settings
+                                      js-missing?
+                                      gettext-missing?
+                                      verify-po-folders
+                                      find-po-files)]
     (println "Extracting strings")
-    (run "xgettext" "--from-code=UTF-8" "--debug" "-k" "-kfulcro_tr:1" "-kfulcro_trc:1c,2" "-kfulcro_trf:1" "-o" messages-pot js-path)
+    (let [args (remove nil?
+                       ["xgettext" "--from-code=UTF-8" "--debug"
+                        (when no-location? "--no-location")
+                        (when sort-output? "--sort-output")
+                        "-k" "-kfulcro_tr:1" "-kfulcro_trc:1c,2" "-kfulcro_trf:1" "-o" messages-pot js-path])]
+      (apply run args))
     (doseq [po (:existing-po-files settings)]
       (when (.exists (io/as-file (po-path settings po)))
         (println "Merging extracted PO template file to existing translations for " po)
@@ -210,10 +215,10 @@
   [{:keys [src po as-modules?] :or {src "src" po "i18n" as-modules? false} :as settings}]
   (let [{:keys [existing-po-files output-path outdir]
          :as   settings} (some-> {:src src :ns "translations" :po po :as-modules? as-modules?}
-                           expand-settings
-                           verify-po-folders
-                           verify-source-folders
-                           find-po-files)
+                                 expand-settings
+                                 verify-po-folders
+                                 verify-source-folders
+                                 find-po-files)
         replace-hyphen #(str/replace % #"-" "_")
         locales        (map clojure-ize-locale existing-po-files)]
     (println "po path is: " po)
@@ -226,4 +231,3 @@
         (println "Writing " cljc-trans-path)
         (spit cljc-trans-path cljc-translations)))
     (println "Deployed translations.")))
-
