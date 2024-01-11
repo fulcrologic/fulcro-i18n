@@ -238,7 +238,75 @@ The `"po-files"` argument is the location of the po files.
 If it is a relative path, the resources will be searched (i.e. CLASSPATH).
 If it is an absolute path, then the local disk will be searched instead.
 
-== Extracting Strings
+== Extracting Strings (Lisp method)
+
+Since Clojure looks pretty much like Lisp, the `xgettext` utility can usually extract strings directly from you CLJ,
+CLJS, and CLJC files! Let's say you wanted to lay out your i18n files like this:
+
+[source, sh]
+-----
+src/main
+├── config
+│   ├── i18n
+│   │   ├── Makefile
+│   │   ├── es.mo
+│   │   ├── es.po
+│   │   └── messages.pot
+...
+-----
+
+so that your po files will be on the classpath in production for loading. The content of the `Makefile` can be:
+
+[source, Makefile]
+------
+ALL_SRC := $(shell find ../.. -type f -name '*.clj*')
+
+i18n: es.po
+
+messages.pot: $(ALL_SRC)
+        xgettext --language=Lisp --from-code=UTF-8 -k -ktr:1 -ktrc:1c,2 -ktrf:1 -o messages.pot $(ALL_SRC)
+
+es.po: messages.pot
+        msgmerge --force-po --no-wrap -U es.po messages.pot
+
+.PHONY: i18n
+------
+
+The Makefile assumes that you've generated `es.po` at least once. To do that run `make messages.pot` and run
+a translation app like `POEdit.app` to make your first set of translations.
+
+Now every time you're ready for doing a new release simply go to the `src/main/config/i18n` and run `make`. This will build an updated `es.po` 
+file, and merge any existing translations with the new extractions in the `pot` file. Just make sure you refer the `tr` et al functions
+(don't use a ns alias. The code should use `(tr ...)`, not `(i18n/tr ...)`.
+
+Of course, you'll need to re-run `POEdit.app` (or similar) on the resulting file(s) to fix any missing/changed
+translations.
+
+To add more languages, just add more `po` targets. For example, to add German:
+
+[source, Makefile]
+-----
+ALL_SRC := $(shell find ../.. -type f -name '*.clj*')
+
+i18n: es.po de.po
+
+messages.pot: $(ALL_SRC)
+        xgettext --language=Lisp --from-code=UTF-8 -k -ktr:1 -ktrc:1c,2 -ktrf:1 -o messages.pot $(ALL_SRC)
+
+es.po: messages.pot
+        msgmerge --force-po --no-wrap -U es.po messages.pot
+
+de.po: messages.pot
+        msgmerge --force-po --no-wrap -U de.po messages.pot
+
+.PHONY: i18n
+-----
+
+== Extracting Strings (js method)
+
+The `xgettext` command has a Lisp mode, which is generally recommended, but if for some reason that crashes on your code
+and you cannot fix it, you can compile your cljs to js, and extract the strings in Javascript mode. If you
+can use Lisp mode, do it. The results are better because the source line attribution works there.
 
 You can extract the strings from your UI for translation using GNU's CLI utility `xgettext` (available via Brew, etc).
 
