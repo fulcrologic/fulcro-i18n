@@ -2,11 +2,15 @@
   "name": "fulcro-i18n",
   "version": "1.0.0",
   "description": "Testing",
+  "packageManager": "pnpm@11.21.0",
+  "scripts": {
+    "preinstall": "npx only-allow@1.2.2 pnpm"
+  },
   "main": "index.js",
   "directories": {},
   "devDependencies": {
-    "intl-messageformat": "^9.3.11",
-    "karma": "^6.4.1",
+    "intl-messageformat": "9.13.0",
+    "karma": "6.4.2",
     "karma-chrome-launcher": "3.1.0",
     "karma-cljs-test": "0.1.0",
     "react": "18.2.0",
@@ -16,7 +20,7 @@
   "author": "Tony Kay",
   "license": "MIT",
   "dependencies": {
-    "highlight.js": "^11.7.0",
+    "highlight.js": "11.8.0",
     "react-grid-layout": "1.3.4"
   }
 }

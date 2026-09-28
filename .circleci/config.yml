@@ -3,14 +3,18 @@ orbs:
   browser-tools: circleci/browser-tools@1.5.3
 jobs:
   cljs:
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
     docker:
-      - image: cimg/clojure:1.10.3-browsers
+      - image: cimg/clojure:1.12.6-openjdk-21.0-browsers
     steps:
       - checkout
+      - run: node --version
+      - run: sudo corepack enable pnpm || sudo npm i -g pnpm@11.21.0
       - restore_cache:
-          key: cljs-{{ checksum "deps.edn" }}-{{ checksum "package.json" }}
-      - run: npm install
-      - run: npx shadow-cljs -v compile ci-tests
+          key: cljs-{{ checksum "deps.edn" }}-{{ checksum "pnpm-lock.yaml" }}
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec shadow-cljs -v compile ci-tests
       - run: ls -l target
       - browser-tools/install-chrome
       - browser-tools/install-chromedriver
@@ -20,12 +24,12 @@ jobs:
             google-chrome --version
             chromedriver --version
             java -jar /usr/local/bin/selenium.jar --version
-      - run: npx karma start --single-run
+      - run: pnpm exec karma start --single-run
       - save_cache:
           paths:
-            - node_modules
+            - ~/.local/share/pnpm/store
             - ~/.m2
-          key: cljs-{{ checksum "deps.edn" }}-{{ checksum "package.json" }}
+          key: cljs-{{ checksum "deps.edn" }}-{{ checksum "pnpm-lock.yaml" }}
   clj:
     docker:
       - image: cimg/clojure:1.10.3
